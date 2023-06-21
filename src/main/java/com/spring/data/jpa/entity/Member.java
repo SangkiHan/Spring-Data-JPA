@@ -32,4 +32,10 @@ public class Member {
 		this.team = team;
 		team.getMembers().add(this);
 	}
+
+	public Member(Long id, String username, int age) {
+		this.id = id;
+		this.username = username;
+		this.age = age;
+	}
 }
