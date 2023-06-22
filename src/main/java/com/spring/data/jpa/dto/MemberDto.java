@@ -21,6 +21,12 @@ public class MemberDto {
 		private int age;
 		private TeamDto teamDto;
 		
+		public Info(Long id, String userName, String teamName) {
+			this.id = id;
+			this.username = userName;
+			this.teamDto.setName(teamName);
+		}
+		
 		public Info(Member member) {
 			this.id = member.getId();
 			this.username = member.getUsername();
