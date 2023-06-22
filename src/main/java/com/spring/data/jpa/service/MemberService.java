@@ -97,7 +97,6 @@ public class MemberService {
 		return infos;
 	}
 	
-	
 	public int updateMember(MemberDto.Request info) {
 		return memberRepository.updateMember(info.getId(), info.getUsername());
 	}

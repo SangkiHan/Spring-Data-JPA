@@ -10,15 +10,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of= {"id","name"})
-public class Team {
+public class Team extends BaseEntity{
 	@Id @GeneratedValue
 	@Column(name = "team_id")
 	private Long id;
