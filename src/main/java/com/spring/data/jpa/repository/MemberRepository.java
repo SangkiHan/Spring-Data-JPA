@@ -6,11 +6,12 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.spring.data.jpa.dto.MemberDto;
 import com.spring.data.jpa.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long>{
@@ -28,8 +29,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
 	@Query("select m.username from Member m")
 	List<String> findUsernameList();
 	
-	@Query("select new com.spring.data.jpa.dto.MemberDto.Info(m.id, m.username, t.name) from Member m join m.team t")
-	List<MemberDto.Info> findMemberDtoList();
+//	@Query("select new com.spring.data.jpa.dto.MemberDto.Info(m.id, m.username, t.name) from Member m join m.team t")
+//	List<MemberDto.Info> findMemberDtoList();
 	
 	// 응답 파라미터 타입 예제
 	List<Member> findListByUsername(String username);//컬렉션
@@ -37,9 +38,24 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
 	Optional<Member> findOptionalByUsername(String username);//단건 optional
 	
 	//페이징예제
-	Page<Member> findAllByPaging(Pageable pageable);
+	@Query("select m from Member m")
+	Page<Member> findAllPaging(Pageable pageable);
 	
 	//Slice예제
-	Slice<Member> findAllBySlice(Pageable pageable);
+	@Query("select m from Member m")
+	Slice<Member> findAllSlice(Pageable pageable);
+	
+	/*
+	 * !!!주의 벌크성 수정은 영속성컨텍스트에 반영이 안되기 때문에 update 후 바로 조회를 하려면 flush로 DB에 반영을 해주고 clear로 영속성컨텍스트 초기화를 해줘야한다. 
+	 * */
+	@Modifying
+	@Query("update Member m set m.username = :username where member_id = :id")
+	public int updateMember(@Param("id") Long id, @Param("username") String username);
+	
+//	@Query("select m from Member m left join fetch m.team t")
+	
+	@Override
+	@EntityGraph(attributePaths = "team")
+	public List<Member> findAll();
 	
 }

@@ -52,10 +52,11 @@ public class MemberService {
 	/*
 	 * Paging 예제
 	 * */
+	@SuppressWarnings("unused")
 	public List<MemberDto.Info> selectListByPaging(PageDto pageDto){
-		PageRequest pageRequest = PageRequest.of(pageDto.getOffset(), pageDto.getLimit(), Sort.by(Sort.Direction.DESC));
+		PageRequest pageRequest = PageRequest.of(pageDto.getOffset(), pageDto.getLimit(), Sort.by(Sort.Direction.DESC, "id"));
 		
-		Page<Member> page = memberRepository.findAllByPaging(pageRequest);
+		Page<Member> page = memberRepository.findAllPaging(pageRequest);
 		
 		Page<MemberDto.Info> infos = page.map(member -> new MemberDto.Info(member));
 		
@@ -73,10 +74,11 @@ public class MemberService {
 	 * Slice 예제
 	 * Slice는 앱에서 더보기같은 기능을 개발할 때 사용하는 기능으로 다음페이지가 있는지 없는 지 limit를 +1하여 데이터 한개를 더 조회하는 식으로 다음페이지여부를 판단한다.
 	 * */
+	@SuppressWarnings("unused")
 	public List<MemberDto.Info> selectListBySlice(PageDto pageDto){
 		PageRequest pageRequest = PageRequest.of(pageDto.getOffset(), pageDto.getLimit(), Sort.by(Sort.Direction.DESC));
 		
-		Slice<Member> slice = memberRepository.findAllByPaging(pageRequest);
+		Slice<Member> slice = memberRepository.findAllPaging(pageRequest);
 		Slice<MemberDto.Info> infos = slice.map(member -> new MemberDto.Info(member));
 		
 		List<MemberDto.Info> members = infos.getContent();
@@ -85,5 +87,18 @@ public class MemberService {
 		int pageNumber = slice.getNumber(); //현재 페이지 넘버
 		
 		return members;
+	}
+	
+	public List<MemberDto.Info> selectListByFetch(){
+		List<Member> member = memberRepository.findAll();
+		List<MemberDto.Info> infos = member.stream()
+				.map(o -> new MemberDto.Info(o))
+				.collect(Collectors.toList());
+		return infos;
+	}
+	
+	
+	public int updateMember(MemberDto.Request info) {
+		return memberRepository.updateMember(info.getId(), info.getUsername());
 	}
 }

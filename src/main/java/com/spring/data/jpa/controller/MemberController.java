@@ -27,8 +27,8 @@ public class MemberController {
 		memberService.save(memberDto);
 	}
 	
-	@GetMapping("/selectOne")
-	public MemberDto.Info selectOne(@RequestParam("memberId") Long memberId){
+	@GetMapping("/v1/selectOne")
+	public MemberDto.Info selectOneV1(@RequestParam("memberId") Long memberId){
 		return memberService.selectOne(memberId);
 	}
 	
@@ -38,7 +38,18 @@ public class MemberController {
 	}
 	
 	@GetMapping("/v2/selectList")
-	public List<MemberDto.Info> selectListV2(PageDto pageDto){
+	public List<MemberDto.Info> selectListV2(@RequestBody PageDto pageDto){
 		return memberService.selectListByPaging(pageDto);
 	}
+	
+	@GetMapping("/v3/selectList")
+	public List<MemberDto.Info> selectListV3(){
+		return memberService.selectListByFetch();
+	}
+	
+	@PostMapping("/update")
+	public void update(@RequestBody MemberDto.Request info) {
+		memberService.updateMember(info);
+	}
 }
+
