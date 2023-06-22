@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.data.jpa.dto.MemberDto;
+import com.spring.data.jpa.dto.PageDto;
 import com.spring.data.jpa.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,13 @@ public class MemberController {
 		return memberService.selectOne(memberId);
 	}
 	
-	@GetMapping("/selectList")
-	public List<MemberDto.Info> selectList(){
+	@GetMapping("/v1/selectList")
+	public List<MemberDto.Info> selectListV1(){
 		return memberService.selectList();
+	}
+	
+	@GetMapping("/v2/selectList")
+	public List<MemberDto.Info> selectListV2(PageDto pageDto){
+		return memberService.selectListByPaging(pageDto);
 	}
 }

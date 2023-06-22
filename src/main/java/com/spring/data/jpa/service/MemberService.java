@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.spring.data.jpa.dto.MemberDto;
+import com.spring.data.jpa.dto.PageDto;
 import com.spring.data.jpa.entity.Member;
 import com.spring.data.jpa.entity.Team;
 import com.spring.data.jpa.repository.MemberRepository;
@@ -51,39 +52,38 @@ public class MemberService {
 	/*
 	 * Paging 예제
 	 * */
-	public List<MemberDto.Info> selectListByPaging(){
-		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC));
+	public List<MemberDto.Info> selectListByPaging(PageDto pageDto){
+		PageRequest pageRequest = PageRequest.of(pageDto.getOffset(), pageDto.getLimit(), Sort.by(Sort.Direction.DESC));
 		
-		Page<Member> member = memberRepository.findAllByPaging(pageRequest);
-		List<Member> members = member.getContent();
+		Page<Member> page = memberRepository.findAllByPaging(pageRequest);
+		
+		Page<MemberDto.Info> infos = page.map(member -> new MemberDto.Info(member));
+		
+		List<MemberDto.Info> members = infos.getContent();
 		
 		int memberSize = members.size(); //members 사이즈
-		Long elementsTotalCnt = member.getTotalElements(); //member의 total개수
-		int pageNumber = member.getNumber(); //현재 페이지 넘버
-		int pageTotalCnt = member.getTotalPages(); //페이지 전체개수
+		Long elementsTotalCnt = page.getTotalElements(); //member의 total개수
+		int pageNumber = page.getNumber(); //현재 페이지 넘버
+		int pageTotalCnt = page.getTotalPages(); //페이지 전체개수
 		
-		List<MemberDto.Info> infos = members.stream()
-				.map(o -> new MemberDto.Info(o))
-				.collect(Collectors.toList());
-		return infos;
+		return members;
 	}
 	
 	/*
 	 * Slice 예제
 	 * Slice는 앱에서 더보기같은 기능을 개발할 때 사용하는 기능으로 다음페이지가 있는지 없는 지 limit를 +1하여 데이터 한개를 더 조회하는 식으로 다음페이지여부를 판단한다.
 	 * */
-	public List<MemberDto.Info> selectListBySlice(){
-		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC));
+	public List<MemberDto.Info> selectListBySlice(PageDto pageDto){
+		PageRequest pageRequest = PageRequest.of(pageDto.getOffset(), pageDto.getLimit(), Sort.by(Sort.Direction.DESC));
 		
-		Slice<Member> member = memberRepository.findAllByPaging(pageRequest);
-		List<Member> members = member.getContent();
+		Slice<Member> slice = memberRepository.findAllByPaging(pageRequest);
+		Slice<MemberDto.Info> infos = slice.map(member -> new MemberDto.Info(member));
+		
+		List<MemberDto.Info> members = infos.getContent();
 		
 		int memberSize = members.size(); //members 사이즈
-		int pageNumber = member.getNumber(); //현재 페이지 넘버
+		int pageNumber = slice.getNumber(); //현재 페이지 넘버
 		
-		List<MemberDto.Info> infos = members.stream()
-				.map(o -> new MemberDto.Info(o))
-				.collect(Collectors.toList());
-		return infos;
+		return members;
 	}
 }
